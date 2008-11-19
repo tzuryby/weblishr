@@ -1,0 +1,20 @@
+
+
+objects:
+    type: {page|redirect},
+    url,
+    section,
+    start_date,
+    end_date,
+    pub_date,
+    author,
+    title,
+    content,
+    frontier
+    
+feedback:
+    url (FK)
+    author
+    subject
+    content
+    
