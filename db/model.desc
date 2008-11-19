@@ -1,7 +1,7 @@
 
 
 objects:
-    type: {page|redirect},
+    type: {page|redirect}, #future use
     url,
     section,
     start_date,
@@ -17,4 +17,9 @@ feedback:
     author
     subject
     content
+    
+related:
+    url_a (FK),
+    url_b (FK)
+    
     
