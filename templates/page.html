@@ -1,0 +1,6 @@
+$def with (record)
+
+$if record:
+    <h1>$record.title</h1>
+    <h2 class="author">$record.author &em-dash; $record.pub_date</h2>
+    <div class="content">$record.content</div>
