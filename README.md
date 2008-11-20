@@ -1,6 +1,8 @@
 
 #Weblisher
-<span color="red">this project is under development and is not published yet</span>
+
+**this project is under development and is not published yet**
+
 Weblishr is a simple and minimalist blogging system written in python.
 
 open source project used:
