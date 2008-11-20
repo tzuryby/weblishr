@@ -1,12 +1,20 @@
-$def with (x)
+$def with (header, footer, page, site_globals=None)
 
 <html>
     <head>    
-        <title></title>
-
+        <title>
+        $if site_globals:
+            $site_globals.title
+        </title>
+        <link rel="stylesheet" href="/static/css/screen.css" type="text/css" media="screen, projection" />
+        
     </head>
 
     <body>
-        <h1>Hello World</h1>
+        <div class="site">
+            $:header
+            $:page
+            $:footer
+        </div>
     </body>
 </html>
