@@ -1,4 +1,4 @@
-
+from datetime import date, timedelta
 import web
 
 urls = (
@@ -9,7 +9,7 @@ urls = (
 
 class Admin(object):
     def GET(self, url):
-        return web.storage(header='foo', author='foo', pub_date='foo', content='admin')
+        pass #return web.storage(header='foo', author='foo', pub_date='foo', content='admin')
         
     def POST(self):
         pass
@@ -19,8 +19,7 @@ class Ajax(object):
         
 class Page(object):
     def GET(self, url=''):
-        p = load_page(url)
-        return base_template(render.post(p, None))
+        return base_template(load_page(url))
         
 def base_template(page):
     return render.base(
@@ -29,17 +28,29 @@ def base_template(page):
         page, 
         site_globals)
     
+def load_post(url):
+    rows= db.select('objects', where = 'url=$url', vars=locals()).list()
+    p = len(rows) and rows[0]
+    if p:
+        return render.post(p, None)
+        
 def load_page(url):
     ''' will return the matched url or None '''
-    if url == '':
-        return load_frontier()
-        
-    rows= db.select('objects', where = 'url=$url', vars=locals()).list()
-    return len(rows) and rows[0]
+    return url == '' and  load_frontier() \
+        or load_post(url)
+    
     
 def load_frontier():
-    data = web.storage(title='foo', author='foo', pub_date='foo', content='home page')
-    return data
+    dt = [str(i) for i in (date.today() - timedelta(days= 7)).timetuple()]
+    earlier = dt[0] + '-' + dt[1] + '-' + dt[2]
+    web.debug(earlier)
+    rows = db.select('objects', where = 'pub_date >= $earlier', vars=locals()).list()
+    web.debug(rows)
+    sections = set((row.section for row in rows))
+    args = list((section, (row for row in rows if row.section == section)) for section in sections)
+    web.debug(args)
+    if args:
+        return render.home(web.storage(args))
 
 web.webapi.internalerror = web.debugerror
 web.webapi.notfound = lambda: "page not found"
