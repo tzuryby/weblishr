@@ -41,16 +41,16 @@ def load_page(url):
     
     
 def load_frontier():
-    dt = [str(i) for i in (date.today() - timedelta(days= 7)).timetuple()]
-    earlier = dt[0] + '-' + dt[1] + '-' + dt[2]
-    web.debug(earlier)
-    rows = db.select('objects', where = 'pub_date >= $earlier', vars=locals()).list()
-    web.debug(rows)
+    # date and time of the first back day
+    dt = (date.today() - timedelta(days= 7)).timetuple()
+    since = str(dt[0]) + '-' + str(dt[1]) + '-' + str(dt[2])
+    rows = db.select('objects', where = 'pub_date >= $since', vars=locals()).list()
+    args = web.storage()
     sections = set((row.section for row in rows))
-    args = list((section, (row for row in rows if row.section == section)) for section in sections)
-    web.debug(args)
-    if args:
-        return render.home(web.storage(args))
+    for section in sections:
+        args[section] = [row for row in rows if row.section == section]
+
+    return render.home(web.storage(args))
 
 web.webapi.internalerror = web.debugerror
 web.webapi.notfound = lambda: "page not found"

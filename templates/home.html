@@ -2,9 +2,9 @@ $def with (sections)
 
 <div id="home">
     $for section in sections:
-        <h1>section.title</h1>
+        <h1>$section</h1>
             <ul class="posts">
-            $for entry in section:
+            $for entry in sections[section]:
                 <li><span>$entry.pub_date</span> &raquo; <a href="/$entry.url">$entry.title</a></li>
             </ul>
 </div>
