@@ -1,0 +1,10 @@
+$def with (sections)
+
+<div id="home">
+    $for section in sections:
+        <h1>section.title</h1>
+            <ul class="posts">
+            $for entry in section.entries:
+                <li><span>$entry.pub_date</span> &raquo; <a href="/$entry.url">$entry.title</a></li>
+            </ul>
+</div>
