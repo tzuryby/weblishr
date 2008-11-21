@@ -1,7 +1,7 @@
 $def with (sections)
 
 <div id="home">
-    $for section in sections:
+    $for section in sorted(sections.keys()):
         <h1>$section</h1>
             <ul class="posts">
             $for entry in sections[section]:
