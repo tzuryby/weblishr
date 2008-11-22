@@ -1,23 +1,39 @@
 from datetime import date, timedelta
 import web
+#from simplejson import dumps as dump_json
+from config import site_globals
 
 urls = (
-    '/edit/(.*)', 'Editor',
+    #'/ajax/(.*)', 'Ajax',
+    '/archive/(.*)', 'Archive',
+    '/(edit|add)/(.*)', 'Editor',
     '/(.*)', 'View',
 )
 
 web.webapi.internalerror = web.debugerror
-notfound = web.webapi.notfound = lambda url: render.notfound(url)
 web.template.Template.globals['sorted'] = sorted
 db = web.database(dbn='sqlite', db='db/weblishr.db')
-site_globals = web.storage(site_name='Weblishr', title='Weblishr: green publisher')
-
+notfound = web.webapi.notfound = lambda url: render.notfound(url)
 render = web.template.render('templates/')
         
 class Editor(object):
-    def GET(self, url):
+    def GET(self, fn, url):
         page =_get_object(url) or notfound(url)
-        return base_template(render.edit(page))
+        return base_template(render.edit(url, page))
+        
+    def POST(self, fn, url):
+        data = web.input()
+        #del data['_content']
+        web.debug(data)
+        if fn == 'edit':
+            data['where'] = 'url=$url'
+            data['vars'] = locals()
+            db.update('objects', **data)
+        elif fn == 'add':
+            data['pub_date'] = str(date.today())
+            db.insert('objects', **data)
+            
+        web.seeother('/' + url)
         
 class View(object):
     def GET(self, url=''):
@@ -31,30 +47,28 @@ def base_template(page):
         site_globals)
     
 def load_page(url):
-    ''' will return the matched url or None '''
-    page = url == '' and  load_frontier() \
-        or load_post(url)
-    return page or notfound(url)
+    '''homepage OR matched url OR not-found'''
+    return (url == '' and load_frontier() or load_post(url)) or notfound(url)
 
 def _get_object(url):
+    '''first (and only) row OR 0'''
     rows= db.select('objects', where = 'url=$url', vars=locals()).list()
-    o = len(rows) and rows[0]
-    return o
+    return len(rows) and rows[0]
     
 def load_post(url):
     post =_get_object(url)
-    if post:
-        return render.post(post)
+    return post and render.post(post)
     
 def load_frontier():
-    # date and time of the first back day
-    dt = (date.today() - timedelta(days= 7)).timetuple()
-    since = str(dt[0]) + '-' + str(dt[1]) + '-' + str(dt[2])
-    rows = db.select('objects', where = 'pub_date >= $since', vars=locals()).list()
-    sections = sorted(set((row.section for row in rows)))
-    args = web.storage(
-        ((section,[row for row in rows if row.section == section]) for section in sections)
-    )
+    args = web.storage()
+    # get the sections
+    sections = db.select('objects', group='section', order='section')
+    # get last 7 rows per section
+    for section in sections:
+        args[section.section] = db.select(
+            'objects', where='section="%s"' % section.section, 
+            limit= site_globals.posts_per_section)
+            
     return render.home(web.storage(args))
 
 
