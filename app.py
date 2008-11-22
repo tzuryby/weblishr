@@ -1,10 +1,10 @@
 from datetime import date, timedelta
 import web
-#from simplejson import dumps as dump_json
+from simplejson import dumps as dump_json
 from config import site_globals
 
 urls = (
-    #'/ajax/(.*)', 'Ajax',
+    '/ajax/(.*)', 'Ajax',
     '/archive/(.*)', 'Archive',
     '/(edit|add)/(.*)', 'Editor',
     '/(.*)', 'View',
@@ -15,6 +15,11 @@ web.template.Template.globals['sorted'] = sorted
 db = web.database(dbn='sqlite', db='db/weblishr.db')
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
 render = web.template.render('templates/')
+
+class Ajax(object):
+    def GET(self, url):
+        web.header("Content-Type","X-JSON")
+        return dump_json(_get_object(url))
         
 class Editor(object):
     def GET(self, fn, url):
@@ -23,16 +28,16 @@ class Editor(object):
         
     def POST(self, fn, url):
         data = web.input()
-        #del data['_content']
         web.debug(data)
         if fn == 'edit':
             data['where'] = 'url=$url'
             data['vars'] = locals()
-            db.update('objects', **data)
+            fn = db.update
         elif fn == 'add':
             data['pub_date'] = str(date.today())
-            db.insert('objects', **data)
+            fn = db.insert
             
+        fn('objects', **data)
         web.seeother('/' + url)
         
 class View(object):
