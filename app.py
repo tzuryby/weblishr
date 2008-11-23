@@ -54,7 +54,7 @@ class Editor(object):
     @check_permission
     def GET(self, fn, url):
         page =_get_object(url) or notfound(url)
-        return base_template(render.edit(url, page))
+        return edit_template(render.edit(url, page))
         
     @check_permission
     def POST(self, fn, url):
@@ -110,6 +110,18 @@ def base_template(page):
         page, 
         site_globals)
     
+def edit_template(page):
+    edit_path = None
+    if session.user:
+        edit_path = web.ctx.path
+        edit_path = not (edit_path.startswith('/edit') or 
+            edit_path.startswith('/add')) and edit_path[1:]
+    return render.editor(
+        render.header(site_globals, session.user, edit_path), 
+        render.footer(), 
+        page, 
+        site_globals)
+        
 def load_page(url):
     '''homepage OR matched url OR not-found'''
     return (url == '' and load_frontier() or load_post(url)) or notfound(url)

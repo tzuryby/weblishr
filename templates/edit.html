@@ -19,10 +19,6 @@ $def with (url, data=None)
 </form>
 
 <script type="text/javascript" src="/static/js/wymeditor/jquery.wymeditor.js"></script>
-<!--
-<script type="text/javascript" src="/static/js/wymeditor/plugins/hovertools/jquery.wymeditor.hovertools.js"></script>
-<script type="text/javascript" src="/static/js/wymeditor/plugins/resizable/jquery.wymeditor.resizable.js"></script>
--->
 <script type="text/javascript"> 
 
     var editMode = /\/edit\//.test(document.location.pathname);
@@ -45,14 +41,8 @@ $def with (url, data=None)
             new_path = (document.location.pathname).replace('/edit/', '/ajax/');
             jQuery.getJSON(new_path, function(data){
                 for (item in data){
-                    jQuery('#' + item).val(data[item]);                        
-                    if (item === 'content'){
-                        jQuery('#content').wymeditor({ logoHtml: '', html: data[item], 
-                            postInit: function(wym) {
-                                //~ wym.hovertools();
-                                //~ wym.resizable();
-                        }});
-                    }
+                    jQuery('#' + item).val(data[item]);
+                    item === 'content' && jQuery('#content').wymeditor({ logoHtml: '', html: data[item]});
                 }
             });
         }

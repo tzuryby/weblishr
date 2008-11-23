@@ -63,9 +63,9 @@ ul.posts {
 }
 
     ul.posts li {
-	line-height: 1.75em;
+		line-height: 1.75em;
     }
-
+    
     ul.posts span {
 	color: #aaa;
 	font-family: Monaco, "Courier New", monospace;
@@ -84,6 +84,10 @@ ul.posts {
     width: 40em;
     margin: 3em auto 2em auto;
     line-height: 1.5em;
+}
+
+.editor {
+    width: 55em;
 }
 
 .title {
@@ -206,6 +210,10 @@ form {
 	
 	form input.w-50{
 		width: 50% !important;
+	}
+	
+	form input.w-25{
+		width: 25% !important;
 	}
 	
 	form textarea{
