@@ -39,7 +39,7 @@ a {
 }
 
 a:hover {
-    color: black;
+    color: #000;
 }
 
 a:visited {
@@ -93,34 +93,39 @@ ul.posts {
 }
 
     .site .title a {
-	color: #a00;
-	text-decoration: none;
+		color: #a00;
+		text-decoration: none;
     }
     
     .site .title a:hover {
-	color: black;
+		
+		color: black;
     }
 
     .site .title a.extra {
-	color: #aaa;
-	text-decoration: none;
-	margin-left: 1em;
+		color: #aaa;
+		text-decoration: none;
+		margin-left: 1em;
     }
     
     .site .title a.extra:hover {
-	color: black;
+		color: black;
     }
 
+	.site .title a.right {
+		float:right;
+		/*margin-left: 20em;*/
+	} 
     .site .meta {
-	color: #aaa;
+		color: #aaa;
     }
 
     .site .footer {
-	font-size: 80%;
-	color: #666;
-	border-top: 4px solid #eee;
-	margin-top: 2em;
-	overflow: hidden;
+		font-size: 80%;
+		color: #666;
+		border-top: 4px solid #eee;
+		margin-top: 2em;
+		overflow: hidden;
     }
     
 	.site .footer .contact {
@@ -129,7 +134,7 @@ ul.posts {
 	}
 	
 	    .site .footer .contact a {
-		color: #8085C1;
+			color: #8085C1;
 	    }
 	
 	.site .footer .rss {
@@ -199,9 +204,16 @@ form {
 		width: 100%;
 	}
 	
+	form input.w-50{
+		width: 50% !important;
+	}
+	
 	form textarea{
 		width: 100%;
 		height: 24em;
 	}
 
 	
+/* typography.css */
+ul, ol {margin:0 0 1em 2.5em;}
+li {margin-bottom:0.5em}

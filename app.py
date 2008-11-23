@@ -3,9 +3,14 @@ import web
 from simplejson import dumps as dump_json
 from config import site_globals
 
+
+site_globals.ctx = web.ctx
+
 urls = (
     '/ajax/(.*)', 'Ajax',
     '/archive/(.*)', 'Archive',
+    '/login', 'Login',
+    '/logout', 'Logout',
     '/(edit|add)/(.*)', 'Editor',
     '/(.*)', 'View',
 )
@@ -15,20 +20,45 @@ web.template.Template.globals['sorted'] = sorted
 db = web.database(dbn='sqlite', db='db/weblishr.db')
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
 render = web.template.render('templates/')
+app = web.application(urls, globals())
 
+if web.config.get('_session') is None:
+    session = web.session.Session(
+        app, web.session.DiskStore('sessions'), 
+        {'user': None, 'previous_url': '/'}
+    )
+    web.config._session = session
+else:
+    session = web.config._session
+
+def start():
+    app.run()
+
+def check_permission(fn, *args, **kwargs):
+    def proxy(*args, **kwargs):
+        if session.user:
+            return fn(*args, **kwargs)
+        else:
+            session.previous_url = web.ctx.path
+            web.seeother('/login')
+            
+    return proxy
+    
 class Ajax(object):
     def GET(self, url):
         web.header("Content-Type","X-JSON")
         return dump_json(_get_object(url))
         
 class Editor(object):
+    
+    @check_permission
     def GET(self, fn, url):
         page =_get_object(url) or notfound(url)
         return base_template(render.edit(url, page))
         
+    @check_permission
     def POST(self, fn, url):
         data = web.input()
-        web.debug(data)
         if fn == 'edit':
             data['where'] = 'url=$url'
             data['vars'] = locals()
@@ -43,10 +73,39 @@ class Editor(object):
 class View(object):
     def GET(self, url=''):
         return base_template(load_page(url))
+
+class Login(object):
+    def GET(object):
+        return base_template(render.login())
         
+    def POST(self):
+        input = web.input()
+        session.user = valid_login(input.username, input.password)
+        if session.user:
+            redirect_previous()
+        else:
+            web.seeother('/login')
+class Logout(object):
+    def GET(self):
+        session.kill()
+        web.redirect('/')
+    
+def valid_login(username, password):
+    return site_globals.username == username and site_globals.password == password
+
+def redirect_previous():
+    url = session.previous_url
+    web.redirect(url)
+    session.previous_url = None
+    
 def base_template(page):
+    edit_path = None
+    if session.user:
+        edit_path = web.ctx.path
+        edit_path = not (edit_path.startswith('/edit') or 
+            edit_path.startswith('/add')) and edit_path[1:]
     return render.base(
-        render.header(site_globals), 
+        render.header(site_globals, session.user, edit_path), 
         render.footer(), 
         page, 
         site_globals)
@@ -78,5 +137,4 @@ def load_frontier():
 
 
 if __name__== "__main__":
-    web.application(urls, globals()).run()
-    
+    start()

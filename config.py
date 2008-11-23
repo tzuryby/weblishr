@@ -12,4 +12,7 @@ site_globals = web.storage(
     
     posts_per_section = 7,
     
+    username = 'tzury',
+    
+    password = 'password'
 )
