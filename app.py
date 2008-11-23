@@ -18,6 +18,9 @@ urls = (
 web.webapi.internalerror = web.debugerror
 web.template.Template.globals['sorted'] = sorted
 db = web.database(dbn='sqlite', db='db/weblishr.db')
+
+web.config.db_type = 'webpy.db'
+
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
 render = web.template.render('templates/')
 app = web.application(urls, globals())

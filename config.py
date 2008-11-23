@@ -14,5 +14,7 @@ site_globals = web.storage(
     
     username = 'tzury',
     
-    password = 'password'
+    password = 'password', 
+    
+    db_type = 'webpy.db',
 )
