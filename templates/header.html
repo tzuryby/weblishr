@@ -4,10 +4,11 @@ $def with (site_globals, superuser=None, view_editor=None)
     <a href="/">$site_globals.site_name</a>
     <a class="extra" href="/">home</a>
     $if superuser:
+        <span>&middot;</span>
         $if view_editor:
             <a class="extra" href="/edit$site_globals.ctx.path">edit page &para;</a>
-        <a class="extra" href="/add/new">new page &raquo;</a>
-        <a class="extra" href="/logout">logout &raquo;</a>
-        
-    
+            <span>&middot;</span>
+        <a class="extra" href="/add/new">new page</a>
+        <span>&middot;</span>
+        <a class="extra" href="/logout">logout</a>
 </div>

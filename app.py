@@ -2,7 +2,7 @@ from datetime import date, timedelta
 import web
 from simplejson import dumps as dump_json
 from config import site_globals
-
+from data import WebDBProvider
 
 site_globals.ctx = web.ctx
 
@@ -19,7 +19,7 @@ web.webapi.internalerror = web.debugerror
 web.template.Template.globals['sorted'] = sorted
 db = web.database(dbn='sqlite', db='db/weblishr.db')
 
-web.config.db_type = 'webpy.db'
+db_provider = WebDBProvider(db)
 
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
 render = web.template.render('templates/')
@@ -65,12 +65,12 @@ class Editor(object):
         if fn == 'edit':
             data['where'] = 'url=$url'
             data['vars'] = locals()
-            fn = db.update
+            db_provider.update_object(**data)
+            
         elif fn == 'add':
             data['pub_date'] = str(date.today())
-            fn = db.insert
+            db_provider.add_object(**data)
             
-        fn('objects', **data)
         web.seeother('/' + url)
         
 class View(object):
@@ -131,22 +131,24 @@ def load_page(url):
 
 def _get_object(url):
     '''first (and only) row OR 0'''
-    rows= db.select('objects', where = 'url=$url', vars=locals()).list()
-    return len(rows) and rows[0]
+    #~ rows= db.select('objects', where = 'url=$url', vars=locals()).list()
+    #~ return len(rows) and rows[0]
+    return db_provider.get_object(url)
     
 def load_post(url):
     post =_get_object(url)
     return post and render.post(post)
     
 def load_frontier():
-    args = web.storage()
-    # get the sections
-    sections = db.select('objects', group='section', order='section')
-    # get last 7 rows per section
-    for section in sections:
-        args[section.section] = db.select(
-            'objects', where='section="%s"' % section.section, 
-            limit= site_globals.posts_per_section)
+    args = db_provider.get_frontier()
+    #~ args = web.storage()
+    #~ # get the sections
+    #~ sections = db.select('objects', group='section', order='section')
+    #~ # get last 7 rows per section
+    #~ for section in sections:
+        #~ args[section.section] = db.select(
+            #~ 'objects', where='section="%s"' % section.section, 
+            #~ limit= site_globals.posts_per_section)
             
     return render.home(web.storage(args))
 
