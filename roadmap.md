@@ -4,8 +4,9 @@
  * add google app-engine interface
  * unified so one can choose between databse and google app-storage
   
-## RSS/ATOM
+## rss / atom
  * RSS, Atom feeds
-#Commens
+
+##Commens
  * anti-spam captcha
   
