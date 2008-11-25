@@ -45,6 +45,7 @@ $def with (url, data=None)
                     item === 'content' && jQuery('#content').wymeditor({ logoHtml: '', html: data[item]});
                 }
             });
+            jQuery("#url").attr("disabled", "disabled");
         }
         // Load WYMEditor
         else if (addMode){

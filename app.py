@@ -28,7 +28,7 @@ elif site_globals.db_env == 'gae.datastore':
     db_provider = GAEDataStoreProvider()
 
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
-render = web.template.render('templates/')
+render = web.template.render('templates_he/')
 app = web.application(urls, globals())
 
 if web.config.get('_session') is None:

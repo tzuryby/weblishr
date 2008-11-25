@@ -42,9 +42,10 @@ class WebDBProvider(Provider):
         sections = self.db.select('objects', group='section', order='section')
         # get last N rows per section
         for section in sections:
-            args[section.section] = self.db.select(
-                'objects', where='section="%s"' % section.section, 
-                limit= site_globals.posts_per_section, order = 'pub_date desc')
+            args[section.section] = self.db.select( 'objects', 
+                where='section=$section.section', 
+                limit= site_globals.posts_per_section, 
+                order = 'pub_date desc', vars=locals())
                 
         return args
         
