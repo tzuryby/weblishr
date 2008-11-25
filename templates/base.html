@@ -1,4 +1,4 @@
-$def with (header, footer, page, site_globals=None)
+$def with (header, footer, page, site_globals=None, register_script=None)
 
 <html>
     <head>
@@ -19,5 +19,9 @@ $def with (header, footer, page, site_globals=None)
             $:page
             $:footer
         </div>
+        $if register_script:
+            <script type='text/javascript'>
+            $:register_script
+            </script>
     </body>
 </html>

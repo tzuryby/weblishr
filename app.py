@@ -1,14 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
 from datetime import date, timedelta
 import web
 from simplejson import dumps as dump_json
-from config import site_globals
+from config import site_globals, client_params
 from data import WebDBProvider
 
 site_globals.ctx = web.ctx
 
 urls = (
     '/ajax/(.*)', 'Ajax',
-    '/archive/(.*)', 'Archive',
+    '/archive', 'Archive',
     '/login', 'Login',
     '/logout', 'Logout',
     '/(edit|add)/(.*)', 'Editor',
@@ -17,12 +20,15 @@ urls = (
 
 web.webapi.internalerror = web.debugerror
 web.template.Template.globals['sorted'] = sorted
-db = web.database(dbn='sqlite', db='db/weblishr.db')
+db_provider = None
 
-db_provider = WebDBProvider(db)
+if site_globals.db_env == 'webpy.db':
+    db_provider = WebDBProvider()
+elif site_globals.db_env == 'gae.datastore':
+    db_provider = GAEDataStoreProvider()
 
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
-render = web.template.render('templates/')
+render = web.template.render('templates_he/')
 app = web.application(urls, globals())
 
 if web.config.get('_session') is None:
@@ -46,17 +52,22 @@ def check_permission(fn, *args, **kwargs):
             web.seeother('/login')
             
     return proxy
-    
+
+class Archive(object):
+    def GET(self):
+        rows = db_provider.get_archive()
+        return base_template(render.archive(rows))
+        
 class Ajax(object):
     def GET(self, url):
         web.header("Content-Type","X-JSON")
-        return dump_json(_get_object(url))
+        return dump_json(get_object(url))
         
 class Editor(object):
     
     @check_permission
     def GET(self, fn, url):
-        page =_get_object(url) or notfound(url)
+        page =get_object(url) or notfound(url)
         return edit_template(render.edit(url, page))
         
     @check_permission
@@ -107,11 +118,15 @@ def base_template(page):
         edit_path = web.ctx.path
         edit_path = not (edit_path.startswith('/edit') or 
             edit_path.startswith('/add')) and edit_path[1:]
+            
+    register_script = 'window.client_params = %s;' % dump_json(client_params)
+    
     return render.base(
         render.header(site_globals, session.user, edit_path), 
         render.footer(), 
         page, 
-        site_globals)
+        site_globals,
+        register_script)
     
 def edit_template(page):
     edit_path = None
@@ -123,33 +138,22 @@ def edit_template(page):
         render.header(site_globals, session.user, edit_path), 
         render.footer(), 
         page, 
-        site_globals)
+        site_globals,
+        'window.client_params = %s;' % dump_json(client_params))
         
 def load_page(url):
     '''homepage OR matched url OR not-found'''
     return (url == '' and load_frontier() or load_post(url)) or notfound(url)
 
-def _get_object(url):
-    '''first (and only) row OR 0'''
-    #~ rows= db.select('objects', where = 'url=$url', vars=locals()).list()
-    #~ return len(rows) and rows[0]
+def get_object(url):
     return db_provider.get_object(url)
     
 def load_post(url):
-    post =_get_object(url)
+    post = get_object(url)
     return post and render.post(post)
     
 def load_frontier():
     args = db_provider.get_frontier()
-    #~ args = web.storage()
-    #~ # get the sections
-    #~ sections = db.select('objects', group='section', order='section')
-    #~ # get last 7 rows per section
-    #~ for section in sections:
-        #~ args[section.section] = db.select(
-            #~ 'objects', where='section="%s"' % section.section, 
-            #~ limit= site_globals.posts_per_section)
-            
     return render.home(web.storage(args))
 
 

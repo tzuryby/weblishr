@@ -4,12 +4,9 @@ $def with (url, data=None)
     <label for='title'>Title</label><br/>
     <input type='text' name='title' id='title' /><br/>
     <label for='content'>Content</label><br/>
-    <!--<input type="hidden" name="content" id="content"></textarea>-->
     <textarea name="content" id="content"></textarea> <br/>
     <label for='url'>URL</label><br/>
     <input type='text' name='url' id='url' /><br/>
-    <!--<label for='type'>Type</label><br/>
-    <input type='text' name='type' id='type' /><br/>-->
     <label for='section'>Section</label><br/>
     <input type='text' name='section' id='section' /><br/>
     <label for='author'>Author</label><br/>
@@ -50,12 +47,10 @@ $def with (url, data=None)
         else if (addMode){
             jQuery('#content').wymeditor({                           
                 logoHtml: '', 
-                postInit: function(wym) {
-                    wym.hovertools();
-                    wym.resizable();
-                }
-            });
+                html: window.client_params.init_wym_editor
+                });
         }
+        //}
         
         //Bind blur event so: title -> [filter] -> url       
         jQuery("#title").blur(function () {
