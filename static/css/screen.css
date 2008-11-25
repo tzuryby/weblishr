@@ -58,7 +58,7 @@ ul.posts span { color: #aaa; font-family: Monaco, "Courier New", monospace; font
 .site .title a { color: #a00; text-decoration: none; }
 .site .title a:hover { color: black; }
 
-.site .title a.extra { color: #aaa; text-decoration: none; margin-left: 1em; margin-right: 1em; }
+.site .title a.extra { color: #aaa; text-decoration: none; margin-left: 0.5em; margin-right: 0.5em; }
 
 .site .title a.extra:hover { color: black; }
 
