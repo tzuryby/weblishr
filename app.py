@@ -94,7 +94,7 @@ class Login(object):
         
     def POST(self):
         input = web.input()
-        session.get('user') = valid_login(input.username, input.password)
+        session.user = valid_login(input.username, input.password)
         if session.get('user'):
             redirect_previous()
         else:
