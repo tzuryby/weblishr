@@ -45,7 +45,7 @@ def start():
 
 def check_permission(fn, *args, **kwargs):
     def proxy(*args, **kwargs):
-        if session.user:
+        if session.get('user'):
             return fn(*args, **kwargs)
         else:
             session.previous_url = web.ctx.path
@@ -94,8 +94,8 @@ class Login(object):
         
     def POST(self):
         input = web.input()
-        session.user = valid_login(input.username, input.password)
-        if session.user:
+        session.get('user') = valid_login(input.username, input.password)
+        if session.get('user'):
             redirect_previous()
         else:
             web.seeother('/login')
@@ -114,7 +114,7 @@ def redirect_previous():
     
 def base_template(page):
     edit_path = None
-    if session.user:
+    if session.get('user'):
         edit_path = web.ctx.path
         edit_path = not (edit_path.startswith('/edit') or 
             edit_path.startswith('/add')) and edit_path[1:]
@@ -122,7 +122,7 @@ def base_template(page):
     register_script = 'window.client_params = %s;' % dump_json(client_params)
     
     return render.base(
-        render.header(site_globals, session.user, edit_path), 
+        render.header(site_globals, session.get('user'), edit_path), 
         render.footer(), 
         page, 
         site_globals,
@@ -130,12 +130,12 @@ def base_template(page):
     
 def edit_template(page):
     edit_path = None
-    if session.user:
+    if session.get('user'):
         edit_path = web.ctx.path
         edit_path = not (edit_path.startswith('/edit') or 
             edit_path.startswith('/add')) and edit_path[1:]
     return render.editor(
-        render.header(site_globals, session.user, edit_path), 
+        render.header(site_globals, session.get('user'), edit_path), 
         render.footer(), 
         page, 
         site_globals,
