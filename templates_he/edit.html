@@ -53,13 +53,13 @@ $def with (url, data=None)
                 logoHtml: '', 
                 html: window.client_params.init_wym_editor
                 });
+                
+            //Bind blur event so: title -> [filter] -> url       
+            jQuery("#title").blur(function () {
+                jQuery('#url').val(jQuery(this).val().replace(/\W/g, '-').toLowerCase())
+            });                   
         }
-        //}
         
-        //Bind blur event so: title -> [filter] -> url       
-        jQuery("#title").blur(function () {
-            jQuery('#url').val(jQuery(this).val().replace(/\W/g, '-').toLowerCase())
-        });
     });
     
 </script> 
