@@ -30,7 +30,11 @@ $def with (url, data=None)
         jQuery('#form').submit(function() { 
             jQuery('#content').val(jQuery.wymeditors(0).html());
             // submit the form 
-            jQuery(this).ajaxSubmit(); 
+            var queryString = $('#form').formSerialize(); 
+            jQuery.post(document.location.pathname, queryString, function(){
+                location.href = '/' + jQuery('#url').val()
+            }); 
+            //jQuery(this).ajaxSubmit(); 
             // return false to prevent normal browser submit and page navigation
             //location.href = '/' + jQuery('#url').val()
             return false;
