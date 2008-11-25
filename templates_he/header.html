@@ -1,0 +1,16 @@
+$def with (site_globals, superuser=None, view_editor=None)
+
+<div class="title">
+    <a href="/">$site_globals.site_name</a>
+    <a class="extra" href="/">דף הבית</a>
+    <span>&middot;</span>
+    <a class="extra" href="/archive">ארכיון</a>
+    $if superuser:
+        <span>&middot;</span>
+        $if view_editor:
+            <a class="extra" href="/edit$site_globals.ctx.path">עריכה &para;</a>
+            <span>&middot;</span>
+        <a class="extra" href="/add/new">דף חדש</a>
+        <span>&middot;</span>
+        <a class="extra" href="/logout">יציאה</a>
+</div>

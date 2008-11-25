@@ -1,0 +1,27 @@
+$def with (header, footer, page, site_globals=None, register_script=None)
+
+<html dir="rtl">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>
+        $if site_globals:
+            $site_globals.title
+        </title>
+        <link rel="stylesheet" href="/static/css/screen.css" type="text/css" media="screen, projection" />
+        <link rel="shorcut icon" href="/static/media/favicon.ico"/> 
+        <script type="text/javascript" src="/static/js/jquery.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.form.js"></script>
+    </head>
+
+    <body>
+        <div class="site">
+            $:header
+            $:page
+            $:footer
+        </div>
+        $if register_script:
+            <script type='text/javascript'>
+            $:register_script
+            </script>
+    </body>
+</html>

@@ -1,0 +1,17 @@
+$def with (record, related=None)
+
+$if record:
+    <div id="post">
+        <h1>$record.title</h1>
+        <p class="meta">$record.author &mdash; $record.pub_date</p>
+        <p>$:record.content</p>
+    </div>
+    
+    <div id="related">
+    $if related:
+        <h2>מאמרים קשורים</h2>
+        <ul class="posts">
+        $for object in related:
+            <li><span>$object.pub_date</span> &raquo; <a href="/$object.url">$object.title</a></li>
+        </ul>
+    </div>

@@ -1,0 +1,7 @@
+$def with(rows)
+
+<ul class="posts">
+<h1>ארכיון</h1>
+$for row in rows:
+    <li><span>$row.pub_date</span> &raquo; <a href="/$row.url">$row.title</a></li>
+</ul>
