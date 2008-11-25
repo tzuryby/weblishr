@@ -30,7 +30,7 @@ $def with (url, data=None)
         jQuery('#form').submit(function() { 
             jQuery('#content').val(jQuery.wymeditors(0).html());
             // submit the form 
-            var queryString = $('#form').formSerialize(); 
+            var queryString = jQuery('#form').formSerialize(); 
             jQuery.post(document.location.pathname, queryString, function(){
                 location.href = '/' + jQuery('#url').val()
             }); 
