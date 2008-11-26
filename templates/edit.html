@@ -16,47 +16,4 @@ $def with (url, data=None)
 </form>
 
 <script type="text/javascript" src="/static/js/wymeditor/jquery.wymeditor.js"></script>
-<script type="text/javascript"> 
-
-    var editMode = /\/edit\//.test(document.location.pathname);
-    var addMode = !editMode;
-    
-    // wait for the DOM to be loaded 
-    jQuery(document).ready(function() { 
-        // Make the form Ajax-Submit
-        jQuery('#form').submit(function() { 
-            jQuery('#content').val(jQuery.wymeditors(0).html());
-            // submit the form 
-            jQuery(this).ajaxSubmit(); 
-            // return false to prevent normal browser submit and page navigation
-            location.href = '/' + jQuery('#url').val()
-            return false;
-        });    
-        
-        // Load data
-        if (editMode){
-            new_path = (document.location.pathname).replace('/edit/', '/ajax/');
-            jQuery.getJSON(new_path, function(data){
-                for (item in data){
-                    jQuery('#' + item).val(data[item]);
-                    item === 'content' && jQuery('#content').wymeditor({ logoHtml: '', html: data[item]});
-                }
-            jQuery("#url").attr("disabled", "disabled");
-        });
-            
-        }
-        // Load WYMEditor
-        else if (addMode){
-            jQuery('#content').wymeditor({                           
-                logoHtml: '', 
-                html: window.client_params.init_wym_editor
-                });
-            
-            //Bind blur event so: title -> [filter] -> url       
-            jQuery("#title").blur(function () {
-                jQuery('#url').val(jQuery(this).val().replace(/\W/g, '-').toLowerCase())
-            });        
-        }
-    });
-    
-</script> 
+<script type="text/javascript" src="/static/js/edit.js"></script>

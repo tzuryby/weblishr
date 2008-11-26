@@ -12,6 +12,8 @@ site_globals = web.storage(
     #title='Weblishr: green publisher',
     title='גלי גבע',
     
+    url = 'http://localhost:8080/',
+    
     posts_per_section = 7,
     
     username = 'tzury',

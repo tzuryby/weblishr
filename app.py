@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
+import time
 import web
 from simplejson import dumps as dump_json
 from config import site_globals, client_params
@@ -12,6 +13,7 @@ site_globals.ctx = web.ctx
 urls = (
     '/ajax/(.*)', 'Ajax',
     '/archive', 'Archive',
+    '/feed/(.*)', 'Feed',
     '/login', 'Login',
     '/logout', 'Logout',
     '/(edit|add)/(.*)', 'Editor',
@@ -20,6 +22,7 @@ urls = (
 
 web.webapi.internalerror = web.debugerror
 web.template.Template.globals['sorted'] = sorted
+
 db_provider = None
 
 if site_globals.db_env == 'webpy.db':
@@ -28,7 +31,7 @@ elif site_globals.db_env == 'gae.datastore':
     db_provider = GAEDataStoreProvider()
 
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
-render = web.template.render('templates_he/')
+render = web.template.render('templates/')
 app = web.application(urls, globals())
 
 if web.config.get('_session') is None:
@@ -63,6 +66,39 @@ class Ajax(object):
         web.header("Content-Type","X-JSON")
         return dump_json(get_object(url))
         
+class Feed(object):
+    
+    #datetime.datetime.today().strftime('%a, %d %h %Y %H:%M:%S GMT')
+    def GET(self, fmt):
+        items = channel = []
+        if fmt == 'rss2':
+            return self.rss2()
+            
+    def rss2(self):
+        channel = web.storage(title=site_globals.site_name, 
+            link = site_globals.url , 
+            description = site_globals.title )
+            
+        items = []
+        sections = db_provider.get_frontier()
+        for section in sections:
+            for item in sections[section]:
+                # title, link, description, pubDate, guid
+                items.append ( web.storage(
+                    title=item.title, 
+                    link = site_globals.url + item.url, 
+                    pubDate = item.pub_date, 
+                    guid = site_globals.url + item.url, 
+                    category = item.section,
+                    description=item.content))
+        web.header("Content-Type","application-xml")
+        return render.rss2(channel, items)
+
+def format_gmt(dt):
+    return datetime(*time.strptime(dt, "%Y-%m-%d %H:%M:%S")[0:5]).strftime('%a, %d %h %Y %H:%M:%S GMT')
+
+web.template.Template.globals['format_gmt'] = format_gmt
+
 class Editor(object):
     
     @check_permission
@@ -77,12 +113,14 @@ class Editor(object):
             data['where'] = 'url=$url'
             data['vars'] = locals()
             db_provider.update_object(**data)
+            web.seeother('/' + url)
             
         elif fn == 'add':
-            data['pub_date'] = str(date.today())
+            data['pub_date'] = str(datetime.today())
             db_provider.add_object(**data)
+            web.seeother('/' + data.url)
             
-        web.seeother('/' + url)
+
         
 class View(object):
     def GET(self, url=''):
