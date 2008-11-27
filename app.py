@@ -6,7 +6,7 @@ import time
 import web
 from simplejson import dumps as dump_json
 from config import site_globals, client_params
-from data import WebDBProvider
+
 
 site_globals.ctx = web.ctx
 
@@ -25,15 +25,20 @@ web.template.Template.globals['sorted'] = sorted
 
 db_provider = None
 
-if site_globals.db_env == 'webpy.db':
+if site_globals.env == 'webpy':
+    from data import WebDBProvider
     db_provider = WebDBProvider()
-elif site_globals.db_env == 'gae.datastore':
+elif site_globals.env == 'gae':
+    from data import GAEDataStoreProvider
     db_provider = GAEDataStoreProvider()
 
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
 render = web.template.render('templates/')
 app = web.application(urls, globals())
 
+web.config._session = web.storage(user=None, previous_url = None)
+session = (lambda: web.config._session)()
+'''
 if web.config.get('_session') is None:
     session = web.session.Session(
         app, web.session.DiskStore('sessions'), 
@@ -42,10 +47,13 @@ if web.config.get('_session') is None:
     web.config._session = session
 else:
     session = web.config._session
-
-def start():
-    app.run()
-
+'''
+def start():    
+    if site_globals.env == 'webpy':
+        app.run()
+    elif site_globals.env == 'gae':
+        app.cgirun()
+        
 def check_permission(fn, *args, **kwargs):
     def proxy(*args, **kwargs):
         if session.get('user'):
@@ -67,7 +75,6 @@ class Ajax(object):
         return dump_json(get_object(url))
         
 class Feed(object):
-    
     #datetime.datetime.today().strftime('%a, %d %h %Y %H:%M:%S GMT')
     def GET(self, fmt):
         items = channel = []
@@ -100,7 +107,6 @@ def format_gmt(dt):
 web.template.Template.globals['format_gmt'] = format_gmt
 
 class Editor(object):
-    
     @check_permission
     def GET(self, fn, url):
         page =get_object(url) or notfound(url)
@@ -113,15 +119,13 @@ class Editor(object):
             data['where'] = 'url=$url'
             data['vars'] = locals()
             db_provider.update_object(**data)
-            web.seeother('/' + url)
+            return web.seeother('/' + url)
             
         elif fn == 'add':
             data['pub_date'] = str(datetime.today())
             db_provider.add_object(**data)
-            web.seeother('/' + data.url)
+            return web.seeother('/' + data.url)
             
-
-        
 class View(object):
     def GET(self, url=''):
         return base_template(load_page(url))
@@ -136,18 +140,18 @@ class Login(object):
         if session.get('user'):
             redirect_previous()
         else:
-            web.seeother('/login')
+            return web.seeother('/login')
+            
 class Logout(object):
     def GET(self):
         session.kill()
-        web.redirect('/')
+        return web.redirect('/')
     
 def valid_login(username, password):
     return site_globals.username == username and site_globals.password == password
 
 def redirect_previous():
-    url = session.previous_url
-    web.redirect(url)
+    web.redirect(session.previous_url)
     session.previous_url = None
     
 def base_template(page):
@@ -157,27 +161,24 @@ def base_template(page):
         edit_path = not (edit_path.startswith('/edit') or 
             edit_path.startswith('/add')) and edit_path[1:]
             
-    register_script = 'window.client_params = %s;' % dump_json(client_params)
+    script = 'window.client_params = %s;' % dump_json(client_params)
+    header = render.header(site_globals, session.get('user'), edit_path)
     
-    return render.base(
-        render.header(site_globals, session.get('user'), edit_path), 
-        render.footer(), 
-        page, 
-        site_globals,
-        register_script)
+    return render.base( header, render.footer(), page, site_globals, script)
     
 def edit_template(page):
     edit_path = None
     if session.get('user'):
-        edit_path = web.ctx.path
-        edit_path = not (edit_path.startswith('/edit') or 
-            edit_path.startswith('/add')) and edit_path[1:]
-    return render.editor(
-        render.header(site_globals, session.get('user'), edit_path), 
-        render.footer(), 
-        page, 
-        site_globals,
-        'window.client_params = %s;' % dump_json(client_params))
+        edit_path = web.ctx.path # the requested URL
+        # do not show edit or add links in 'edit' or 'add' mode
+        edit_mode = not edit_path.startswith('/edit') \
+                    and not edit_path.startswith('/add') # and edit_path[1:]
+    
+    header = render.header(site_globals, session.get('user'), edit_mode)
+    footer = render.footer()
+    script = 'window.client_params = %s;' % dump_json(client_params)
+    
+    return render.editor(header, footer, page, site_globals, script)
         
 def load_page(url):
     '''homepage OR matched url OR not-found'''

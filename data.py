@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
-
+# -*- coding: UTF-8 -
 import web
 from config import site_globals
 '''data layer'''
@@ -23,15 +22,15 @@ class Provider(object):
     def update_object(self, **data):
         raise NotImplemented
         
-    def get_archive(self, num_or_rows):
+    def get_archive(self, num_of_rows):
         raise NotImplemented
-        
+
 class WebDBProvider(Provider):
     def __init__(self, db = web.database(dbn='sqlite', db='db/weblishr.db')):
         self.db = db
         
     def get_object(self, url):
-        '''first (and only) row OR 0'''
+        #first (and only) row OR 0
         rows= self.db.select('objects', where = 'url=$url', vars=locals()).list()
         return len(rows) and rows[0]
 
@@ -61,7 +60,40 @@ class WebDBProvider(Provider):
             kwargs[limit] = num_of_rows
         return self.db.select('objects', **kwargs)
         
-        
+
+'''
+from google.appengine.ext import db
+from google.appengine.api import users
+from google.appengine.ext import webapp
+
+class Objects(db.Model):
+  url = db.StringProperty()
+  type = db.IntegerProperty()
+  section = db.StringProperty()
+  pub_date = db.DateTimeProperty(auto_now_add=True)
+  author = db.StringProperty()
+  title = db.StringProperty()
+  content = db.StringProperty(multiline=True)
+
 class GAEDataStoreProvider(object):
-    pass
-    
+    def get_object(self, url):
+        res = list(db.GqlQuery("SELECT * FROM Objects WHERE url='%s'" % url))
+        if len(res):
+            return res[0]
+        
+    def get_frontier(self):
+        return db.GqlQuery("SELECT * FROM Objects LIMIT 100")
+        
+    def add_object(self, **data):
+        Objects(**data).put()
+        
+    def update_object(self, **data):
+        Objects(**data).put()
+        
+    def get_archive(self, num_of_rows=0):
+        sql = "SELECT * FROM Objects ORDER BY pub_date DESC"
+        if num_of_rows:
+            sql += " LIMIT %d" % num_of_rows
+            
+        return db.GqlQuery(sql)
+'''

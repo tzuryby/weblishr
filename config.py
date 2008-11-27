@@ -20,7 +20,7 @@ site_globals = web.storage(
     
     password = 'password', 
     
-    db_env = 'webpy.db', # webpy.db | gae.datastore
+    env = 'webpy', # webpy | gae
     
 )
 
