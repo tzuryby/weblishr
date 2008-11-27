@@ -1,0 +1,17 @@
+$def with(channel, items)
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>$:channel.title</title>
+        <link>$:channel.link</link>
+        <description>$channel.description</description>
+        $for item in items:
+            <item>
+                 <title>$item.title</title>
+                 <link>$item.link</link>
+                 <description>$item.description</description>
+                 <pubDate>$format_gmt(item.pubDate)</pubDate>
+                 <guid>$item.guid</guid>
+            </item>    
+    </channel>
+</rss>
