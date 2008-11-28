@@ -60,6 +60,7 @@ def base():
         yield '', join_('        <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/feed/rss2" />\n')
         yield '', join_('        <script type="text/javascript" src="/static/js/jquery.js"></script>\n')
         yield '', join_('        <script type="text/javascript" src="/static/js/jquery.form.js"></script>\n')
+        yield '', join_('        <script type="text/javascript" src="/static/js/jquery.player.js"></script>\n')
         yield '', join_('    </head>\n')
         yield '', join_('\n')
         yield '', join_('    <body>\n')
@@ -310,4 +311,3 @@ def footer():
 
 footer = CompiledTemplate(footer(), 'templates/footer.html')
 
-sorted = sorted
