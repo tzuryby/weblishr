@@ -5,6 +5,6 @@ $def with (sections)
         <h1>$section</h1>
             <ul class="posts">
             $for entry in sections[section]:
-                <li><span>$entry.pub_date</span> &raquo; <a href="/$entry.url">$entry.title</a></li>
+                <li><span>$entry.pub_date[:10]</span> &raquo; <a href="/$entry.url">$entry.title</a></li>
             </ul>
 </div>

@@ -1,0 +1,11 @@
+$def with(url)
+
+<form method='post' action='/delete/$url'>
+    <h2>Delete Object</h2>
+    <p>
+        Requested object: <code>/$url</code></p>
+
+    <p class="warn">
+        Warning: delete operation is irreversible. </p>
+    <input type='submit' value='Yes, I am certain about this'>
+</form>

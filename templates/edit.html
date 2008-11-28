@@ -1,4 +1,4 @@
-$def with (url, data=None)
+$def with (url, key_name=None)
 
 <form id="form" action="$url" method="post"> 
     <label for='title'>Title</label><br/>
@@ -11,8 +11,11 @@ $def with (url, data=None)
     <input type='text' name='section' id='section' /><br/>
     <label for='author'>Author</label><br/>
     <input type='text' name='author' id='author' /><br/>
+    <input type='hidden' name='key_name' id='key_name' value="$key_name"/>
+    <input type='hidden' name='pub_date' id='pub_date' />
 <br/>
     <input type="submit" value="Save Changes" /> 
+    <a href="#" id="delete" class="delete">Delete Page</a>
 </form>
 
 <script type="text/javascript" src="/static/js/wymeditor/jquery.wymeditor.js"></script>

@@ -12,7 +12,7 @@ def archive():
         yield '', join_('<ul class="posts">\n')
         yield '', join_('<h1>Archive</h1>\n')
         for row in loop.setup(rows):
-            yield '', join_('<li><span>', escape_(row.pub_date, True), '</span> &raquo; <a href="/', escape_(row.url, True), '">', escape_(row.title, True), '</a></li>\n')
+            yield '', join_('<li><span>', escape_(row.pub_date[:10], True), '</span> &raquo; <a href="/', escape_(row.url, True), '">', escape_(row.title, True), '</a></li>\n')
         yield '', join_('</ul>')
     return __template__
 
@@ -90,7 +90,7 @@ def post():
         if record:
             yield '', join_('<div id="post">\n')
             yield '', join_('    <h1>', escape_(record.title, True), '</h1>\n')
-            yield '', join_('    <p class="meta">', escape_(record.author, True), ' &mdash; ', escape_(record.pub_date, True), '</p>\n')
+            yield '', join_('    <p class="meta">', escape_(record.author, True), ' &mdash; ', escape_(record.pub_date[:10], True), '</p>\n')
             yield '', join_('    <p>', escape_(record.content, False), '</p>\n')
             yield '', join_('</div>\n')
             yield '', join_('\n')
@@ -136,7 +136,7 @@ def home():
             yield '', join_('    ', '<h1>', escape_(section, True), '</h1>\n')
             yield '', join_('    ', '    <ul class="posts">\n')
             for entry in loop.setup(sections[section]):
-                yield '', join_('        ', '<li><span>', escape_(entry.pub_date, True), '</span> &raquo; <a href="/', escape_(entry.url, True), '">', escape_(entry.title, True), '</a></li>\n')
+                yield '', join_('        ', '<li><span>', escape_(entry.pub_date[:10], True), '</span> &raquo; <a href="/', escape_(entry.url, True), '">', escape_(entry.title, True), '</a></li>\n')
             yield '', join_('    ', '    </ul>\n')
         yield '', join_('</div>')
     return __template__
@@ -150,23 +150,8 @@ def rss2():
     join_ = _dummy._join
     escape_ = _dummy._escape
 
-    def __template__(channel, items):
-        yield '', join_('<?xml version="1.0" encoding="UTF-8"?>\n')
-        yield '', join_('<rss version="2.0">\n')
-        yield '', join_('    <channel>\n')
-        yield '', join_('        <title>', escape_(channel.title, False), '</title>\n')
-        yield '', join_('        <link>', escape_(channel.link, False), '</link>\n')
-        yield '', join_('        <description>', escape_(channel.description, True), '</description>\n')
-        for item in loop.setup(items):
-            yield '', join_('        ', '<item>\n')
-            yield '', join_('        ', '     <title>', escape_(item.title, True), '</title>\n')
-            yield '', join_('        ', '     <link>', escape_(item.link, True), '</link>\n')
-            yield '', join_('        ', '     <description>', escape_(item.description, True), '</description>\n')
-            yield '', join_('        ', '     <pubDate>', escape_(format_gmt(item.pubDate), True), '</pubDate>\n')
-            yield '', join_('        ', '     <guid>', escape_(item.guid, True), '</guid>\n')
-            yield '', join_('        ', '</item>    \n')
-        yield '', join_('    </channel>\n')
-        yield '', join_('</rss>')
+    def __template__(feed):
+        yield '', join_(escape_(feed, False))
     return __template__
 
 rss2 = CompiledTemplate(rss2(), 'templates/rss2.html')
@@ -178,7 +163,7 @@ def edit():
     join_ = _dummy._join
     escape_ = _dummy._escape
 
-    def __template__ (url, data=None):
+    def __template__ (url, key_name=None):
         yield '', join_('\n')
         yield '', join_('<form id="form" action="', escape_(url, True), '" method="post"> \n')
         yield '', join_("    <label for='title'>Title</label><br/>\n")
@@ -191,8 +176,11 @@ def edit():
         yield '', join_("    <input type='text' name='section' id='section' /><br/>\n")
         yield '', join_("    <label for='author'>Author</label><br/>\n")
         yield '', join_("    <input type='text' name='author' id='author' /><br/>\n")
+        yield '', join_('    <input type=\'hidden\' name=\'key_name\' id=\'key_name\' value="', escape_(key_name, True), '"/>\n')
+        yield '', join_("    <input type='hidden' name='pub_date' id='pub_date' />\n")
         yield '', join_('<br/>\n')
         yield '', join_('    <input type="submit" value="Save Changes" /> \n')
+        yield '', join_('    <a href="#" id="delete" class="delete">Delete Page</a>\n')
         yield '', join_('</form>\n')
         yield '', join_('\n')
         yield '', join_('<script type="text/javascript" src="/static/js/wymeditor/jquery.wymeditor.js"></script>\n')
@@ -238,6 +226,28 @@ def editor():
     return __template__
 
 editor = CompiledTemplate(editor(), 'templates/editor.html')
+
+
+def delete():
+    loop = ForLoop()
+    _dummy  = CompiledTemplate(lambda: None, "dummy")
+    join_ = _dummy._join
+    escape_ = _dummy._escape
+
+    def __template__(url):
+        yield '', join_('\n')
+        yield '', join_("<form method='post' action='/delete/", escape_(url, True), "'>\n")
+        yield '', join_('    <h2>Delete Object</h2>\n')
+        yield '', join_('    <p>\n')
+        yield '', join_('        Requested object: <code>/', escape_(url, True), '</code></p>\n')
+        yield '', join_('\n')
+        yield '', join_('    <p class="warn">\n')
+        yield '', join_('        Warning: delete operation is irreversible. </p>\n')
+        yield '', join_("    <input type='submit' value='Yes, I am certain about this'>\n")
+        yield '', join_('</form>')
+    return __template__
+
+delete = CompiledTemplate(delete(), 'templates/delete.html')
 
 
 def header():
@@ -300,3 +310,4 @@ def footer():
 
 footer = CompiledTemplate(footer(), 'templates/footer.html')
 
+sorted = sorted

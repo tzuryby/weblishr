@@ -3,7 +3,7 @@ $def with (record, related=None)
 $if record:
     <div id="post">
         <h1>$record.title</h1>
-        <p class="meta">$record.author &mdash; $record.pub_date</p>
+        <p class="meta">$record.author &mdash; $record.pub_date[:10]</p>
         <p>$:record.content</p>
     </div>
     
