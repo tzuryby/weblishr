@@ -3,28 +3,10 @@
 
 import web
 
-__all__ = ['site_globals']
+__all__ = ['site_globals', 'client_params']
 
-site_globals = web.storage(
 
-    site_name= 'Weblishr',
-    
-    title='weblishr - easy publisher',
-    
-    url = 'http://localhost:8080/',
-    
-    posts_per_section = 7,
-    
-    admins = ('afro.systems@gmail.com', 'tzury.by@gmail.com', 'muledriver@gmail.com')
-    
-)
+from data import GAEDataStoreProvider
+settings = GAEDataStoreProvider().get_settings()
 
-# these values are stored under window.client_params
-client_params = web.storage(
-    init_wym_editor = '',
-    #init_wym_editor = '<div dir="rtl"><p>הזן טקסט</p></div>',
-    
-    lang = 'en',
-
-    default_author = 'Tzury Bar Yochay'
-)
+site_globals, client_params = settings.site_globals, settings.client_params

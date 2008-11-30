@@ -18,12 +18,13 @@ db_provider = GAEDataStoreProvider()
 site_globals.ctx = web.ctx
 web.template.Template.globals['sorted'] = sorted
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
-render = web.template.render('templates/')
-
+#render = web.template.render('templates/')
+render = web.template.render('templates/') #, globals={'sorted': sorted}) 
 urls = (
     '/sandbox', 'sandbox',
     '/ajax/(.*)', 'Ajax',
     '/archive', 'Archive',
+    '/settings', 'Settings',
     '/feed/(.*)', 'Feed',
     '/login', 'Login',
     '/logout', 'Logout',
@@ -34,7 +35,6 @@ urls = (
 )
 
 app = web.application(urls, globals())
-
 logout_url = users.create_logout_url('/')
 login_url = users.create_login_url('/')
 
@@ -99,7 +99,6 @@ class Editor(object):
         if fn == 'add':
             import uuid
             key_name = 'article-' + uuid.uuid4().hex
-            web.debug('sending:' + key_name)
         return edit_template(render.edit(url, key_name))
         
     @check_permission
@@ -114,6 +113,30 @@ class Editor(object):
             db_provider.update_object(**data)
             return web.seeother('/' + data.url)
             
+class Settings(object):
+    
+    @check_permission
+    def GET(self):
+        return base_template(render.settings(self.group_settings()))
+        
+    def group_settings(self):
+        settings = [item for item in db_provider.load_settings()]
+        web.debug(settings)
+        data = web.storage()
+        categories = sorted(set((item.category_num, item.category_name) for item in settings))
+        web.debug(categories)
+        
+        for category in categories:
+            data[category[1]] = [item for item in settings if item.category_num == category[0]]
+        
+        web.debug(data)
+        return data
+        
+    @check_permission
+    def POST(self):
+        db_provider.save_settings(web.input())
+        web.seeother('/')
+        
 class View(object):
     def GET(self, url=''):
         return base_template(load_page(url))
@@ -198,5 +221,5 @@ def send_mail(_subject, _body):
 def start():    
     app.cgirun()
 
-if __name__== "__main__":
+if __name__== "__main__":  
     start()
