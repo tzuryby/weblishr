@@ -21,7 +21,7 @@ $(document).ready(function() {
                 item === 'content' && $('#content').wymeditor({ logoHtml: '', html: data[item]});
             }
         $('#delete').attr('href', document.location.pathname.replace('/edit/', '/delete/'));
-    });
+        });
         
     }
     // Load WYMEditor
@@ -34,6 +34,8 @@ $(document).ready(function() {
         //Bind blur event so: title -> [filter] -> url       
         $("#title").blur(function () {
             $('#url').val($(this).val().replace(/\W/g, '-').replace(/-+/g, '-').toLowerCase())
-        });        
+        });
+        
+        $('#delete').hide()
     }
 });

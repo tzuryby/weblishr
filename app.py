@@ -18,8 +18,8 @@ db_provider = GAEDataStoreProvider()
 site_globals.ctx = web.ctx
 web.template.Template.globals['sorted'] = sorted
 notfound = web.webapi.notfound = lambda url: render.notfound(url)
-#render = web.template.render('templates/')
-render = web.template.render('templates/') #, globals={'sorted': sorted}) 
+render = web.template.render(site_globals.templates_path)
+
 urls = (
     '/sandbox', 'sandbox',
     '/ajax/(.*)', 'Ajax',
@@ -77,6 +77,8 @@ class Feed(object):
                     RSSItem(title=item.title, 
                         link = site_globals.url + item.url, 
                         pubDate = item.pub_date, 
+                        author = item.author,
+                        categories = [item.section,],
                         guid = site_globals.url + item.url, 
                         description=item.content))
                         

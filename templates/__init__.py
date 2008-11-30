@@ -274,6 +274,8 @@ def header():
     yield '', join_('       ', '   <span>&middot;</span>\n')
    yield '', join_('    ', '   <a class="extra" href="/add/new">new page</a>\n')
    yield '', join_('    ', '   <span>&middot;</span>\n')
+   yield '', join_('    ', '   <a class="extra" href="/settings">settings</a>\n')
+   yield '', join_('    ', '   <span>&middot;</span>\n')
    yield '', join_('    ', '   <a class="extra" href="/logout">logout</a>\n')
   yield '', join_('</div>\n')
  return __template__

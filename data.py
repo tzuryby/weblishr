@@ -74,6 +74,7 @@ class GAEDataStoreProvider(object):
             Settings(category_num=1, category_name='Global Settings', item_key='url', title = 'Site\'s URL', value = 'http://weblishr.com/').put()
             Settings(category_num=1, category_name='Global Settings', item_key='posts_per_section', title = 'Posts Per Section', value = '7', evaluator='int(%d)').put()
             Settings(category_num=1, category_name='Global Settings', item_key='admins', title = 'Admins', value = 'tzury.by@gmail.com afro.systems@gmail.com', evaluator='"%s".split(" ")').put()
+            Settings(category_num=1, category_name='Global Settings', item_key='templates_path', title = 'Templates Path', value = 'templates/').put()
             
             result = fetch()
         
