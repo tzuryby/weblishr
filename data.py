@@ -63,9 +63,7 @@ class GAEDataStoreProvider(object):
         result = fetch()
         
         if not result.count():
-            f = open('static/css/screen.css')
-            style_info = ''.join(line for line in f)
-            f.close()
+            style_info = css()
 
             Settings(category_num=2, category_name='Client Settings', item_key='init_wym_editor', title = 'Init WYMEditor', value = '').put()
             Settings(category_num=2, category_name='Client Settings', item_key='lang', title = 'Language', value = 'en').put()
@@ -100,3 +98,56 @@ class GAEDataStoreProvider(object):
             item = Settings.gql("WHERE item_key='" + k + "'").fetch(1)[0]
             item.value = v
             db.put(item)
+            
+            
+def css():
+    return '''*{margin:0;padding:0}
+html,body{height:100%}
+body{background-color:white;font:13.34px helvetica,arial,clean,sans-serif;*font-size:small;text-align:center}
+h1,h2,h3,h4,h5,h6{font-size:100%}
+h1{margin-bottom:1em}
+p{margin:1em 0}
+a{color:#00a}
+a:hover{color:black}
+a:visited{color:#a0a}
+table{font-size:inherit;font:100%}
+ul.posts{list-style-type:none;margin-bottom:2em}
+ul.posts li{line-height:1.75em}
+ul.posts span{color:#aaa;font-family:Monaco,"Courier New",monospace;font-size:80%}
+.site{font-size:110%;text-align:justify;width:40em;margin:3em auto 2em auto;line-height:1.5em}
+.title{color:#a00;font-weight:bold;margin-bottom:2em}
+.site .title a{color:#a00;text-decoration:none}
+.site .title a:hover{color:black}
+.site .title a.extra{color:#aaa;text-decoration:none;margin-left:.5em;margin-right:.5em}
+.site .title a.extra:hover{color:black}
+.site .meta{color:#aaa}
+.site .footer{font-size:80%;color:#666;border-top:4px solid #eee;margin-top:2em;overflow:hidden}
+.site .footer .contact{float:left;margin-right:3em}
+.site .footer .contact a{color:#8085C1}
+.site .footer .rss{margin-top:1.1em;margin-right:-.2em;float:right}
+.site .footer .rss img{border:0}
+#post{}
+#post pre{border:1px solid #ddd;background-color:#eef;padding:0 .4em}
+#post code{border:1px solid #ddd;background-color:#eef;font-size:95%;padding:0 .2em}
+#post pre code{border:none}
+#post pre.terminal{border:1px solid black;background-color:#333;color:white}
+#post pre.terminal code{background-color:#333}
+#related{margin-top:2em}
+#related h2{margin-bottom:1em}
+form{padding:8px}
+form input[type=text]{width:100%}
+form input.w-50{width:50%}
+form input.w-25{width:25%}
+form textarea{width:100%;height:24em}
+.warn{color:#a00}
+a.delete{margin-left:24em;color:#a00;text-decoration:none}
+a.delete:hover{color:#fff;background-color:#a00;border-bottom:dotted 1px}
+
+
+ul.tabs-nav{ list-style-image:none; list-style-position:outside; list-style-type:none; }
+ul.tabs-nav li{ float:left; margin:0 0 0 1em; border: 1px solid Gray; border-bottom:0px; padding-left: 1em; padding-right: 1em; }
+ul.tabs-nav li a { text-decoration:none; }
+ul.tabs-nav li.ui-tabs-selected { color: #a00; border: 1px solid #a00; border-bottom:0px;}
+ul.tabs-nav li.ui-tabs-selected a { color: #a00; }
+.ui-tabs-panel {margin: 4px 0 1em 0; border: 1px solid #a00; padding: 1em}
+.ui-tabs-hide { display: none; } '''
