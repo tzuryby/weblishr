@@ -1,0 +1,24 @@
+$def with (settings)
+
+<form method='post' action='/settings'>
+    <div class="tabs-container">
+        <ul id="tabs-names" class="tabs-nav">
+        $for category in settings:
+            <li><a href="#$category.replace(' ', '-')"><span>$category</span></a></li>
+        </ul>
+        <br/>
+        $for category in settings:
+            <div id="$category.replace(' ', '-')">
+            $for item in settings[category]:
+                <label for='$item.item_key'>$item.title:</label><br />
+                $if item.item_key != 'css':
+                    <input type='text' id='$item.item_key' name='$item.item_key' value='$item.value' /><br />
+                $else:
+                    <textarea id='$item.item_key' name='$item.item_key'>$item.value</textarea> <br />
+            </div>
+    </div>
+    <input type='submit' value='Save Settings' />
+</form>
+<script>
+    jQuery('#tabs-names').tabs()
+</script>
