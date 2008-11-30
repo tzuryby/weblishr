@@ -63,8 +63,13 @@ class GAEDataStoreProvider(object):
         result = fetch()
         
         if not result.count():
+            f = open('static/css/screen.css')
+            style_info = ''.join(line for line in f)
+            f.close()
+
             Settings(category_num=2, category_name='Client Settings', item_key='init_wym_editor', title = 'Init WYMEditor', value = '').put()
             Settings(category_num=2, category_name='Client Settings', item_key='lang', title = 'Language', value = 'en').put()
+            Settings(category_num=2, category_name='Client Settings', item_key='css', title = 'Site CSS', value = style_info).put()
 
             Settings(category_num=1, category_name='Global Settings', item_key='site_name', title = 'Site\'s Name', value = 'Weblishr').put()
             Settings(category_num=1, category_name='Global Settings', item_key='title', title = 'Site\'s Title', value = 'weblishr - easy publisher').put()
@@ -80,11 +85,12 @@ class GAEDataStoreProvider(object):
     def get_settings(self):
         '''returns the settings as storage'''
         settings = self.load_settings()
-        data = web.storage(site_globals=web.storage(), client_params=web.storage())
+        data = web.storage(site_globals=web.storage(), 
+            client_params=web.storage())
         for item in settings:
             if item.category_name == 'Global Settings':
                 data.site_globals[item.item_key] = item.value
-            else:
+            elif item.category_name == 'Client Settings':
                 data.client_params[item.item_key] = item.value
                 
         return data

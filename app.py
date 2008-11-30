@@ -162,7 +162,8 @@ class Login(object):
 def base_template(page):        
     script = 'window.client_params = %s;' % dump_json(client_params)
     header = render.header(site_globals, is_admin(), view_editor())
-    return render.base( header, render.footer(), page, site_globals, script)
+    #
+    return render.base( header, render.footer(), page, site_globals, script, client_params.css)
     
 def edit_template(page):
     header = render.header(site_globals, is_admin(), view_editor())

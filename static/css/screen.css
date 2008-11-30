@@ -39,3 +39,18 @@ form textarea{width:100%;height:24em}
 .warn{color:#a00}
 a.delete{margin-left:24em;color:#a00;text-decoration:none}
 a.delete:hover{color:#fff;background-color:#a00;border-bottom:dotted 1px}
+
+
+
+
+/*div.tabs-container { margin-bottom:1em; padding-bottom:1em; border-bottom: solid 1px;  }*/
+ul.tabs-nav{ list-style-image:none; list-style-position:outside; list-style-type:none; }
+ul.tabs-nav li{ float:left; margin:0 0 0 1em; border: 1px solid Gray; border-bottom:0px; padding-left: 1em; padding-right: 1em; }
+ul.tabs-nav li a { text-decoration:none; }
+ul.tabs-nav li.ui-tabs-selected { color: #a00; border: 1px solid #a00; border-bottom:0px;}
+ul.tabs-nav li.ui-tabs-selected a { color: #a00; }
+.ui-tabs-panel {margin: 4px 0 1em 0; border: 1px solid #a00; padding: 1em}
+.ui-tabs-hide { display: none; }
+
+
+

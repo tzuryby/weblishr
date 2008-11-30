@@ -46,7 +46,7 @@ def base():
  join_ = _dummy._join
  escape_ = _dummy._escape
 
- def __template__ (header, footer, page, site_globals=None, register_script=None):
+ def __template__ (header, footer, page, site_globals=None, register_script=None, style_info=None):
   yield '', join_('\n')
   yield '', join_('<html>\n')
   yield '', join_('    <head>\n')
@@ -55,12 +55,15 @@ def base():
   if site_globals:
    yield '', join_('        ', '   ', escape_(site_globals.title, True), '\n')
   yield '', join_('        </title>\n')
-  yield '', join_('        <link rel="stylesheet" href="/static/css/screen.css" type="text/css" media="screen, projection" />\n')
   yield '', join_('        <link rel="shorcut icon" href="/static/media/favicon.ico"/> \n')
   yield '', join_('        <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/feed/rss2" />\n')
   yield '', join_('        <script type="text/javascript" src="/static/js/jquery.js"></script>\n')
+  yield '', join_('        <script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>\n')
   yield '', join_('        <script type="text/javascript" src="/static/js/jquery.form.js"></script>\n')
   yield '', join_('        <script type="text/javascript" src="/static/js/jquery.player.js"></script>\n')
+  yield '', join_('        <style>\n')
+  yield '', join_('            ', escape_(style_info, True), '\n')
+  yield '', join_('        </style>\n')
   yield '', join_('    </head>\n')
   yield '', join_('\n')
   yield '', join_('    <body>\n')
@@ -287,14 +290,27 @@ def settings():
  def __template__ (settings):
   yield '', join_('\n')
   yield '', join_("<form method='post' action='/settings'>\n")
+  yield '', join_('    <div class="tabs-container">\n')
+  yield '', join_('        <ul id="tabs-names" class="tabs-nav">\n')
   for category in loop.setup(settings):
-   yield '', join_('    ', '   <h1>', escape_(category, True), '</h1>\n')
+   yield '', join_('        ', '   <li><a href="#', escape_(category.replace(' ', '-'), True), '"><span>', escape_(category, True), '</span></a></li>\n')
+  yield '', join_('        </ul>\n')
+  yield '', join_('        <br/>\n')
+  for category in loop.setup(settings):
+   yield '', join_('        ', '   <div id="', escape_(category.replace(' ', '-'), True), '">\n')
    for item in loop.setup(settings[category]):
-    yield '', join_('       ', "   <label for='", escape_(item.item_key, True), "'>", escape_(item.title, True), ':</label><br />\n')
-    yield '', join_('       ', "   <input type='text' id='", escape_(item.item_key, True), "' name='", escape_(item.item_key, True), "' value='", escape_(item.value, True), "' /><br />\n")
-   yield '', join_('    ', '   <br/>    \n')
+    yield '', join_('           ', "   <label for='", escape_(item.item_key, True), "'>", escape_(item.title, True), ':</label><br />\n')
+    if item.item_key != 'css':
+     yield '', join_('              ', "   <input type='text' id='", escape_(item.item_key, True), "' name='", escape_(item.item_key, True), "' value='", escape_(item.value, True), "' /><br />\n")
+    else:
+     yield '', join_('              ', "   <textarea id='", escape_(item.item_key, True), "' name='", escape_(item.item_key, True), "'>", escape_(item.value, True), '</textarea> <br />\n')
+   yield '', join_('        ', '   </div>\n')
+  yield '', join_('    </div>\n')
   yield '', join_("    <input type='submit' value='Save Settings' />\n")
-  yield '', join_('</form>')
+  yield '', join_('</form>\n')
+  yield '', join_('<script>\n')
+  yield '', join_("    jQuery('#tabs-names').tabs()\n")
+  yield '', join_('</script>')
  return __template__
 
 settings = CompiledTemplate(settings(), 'templates/settings.html')
@@ -333,4 +349,3 @@ def footer():
 
 footer = CompiledTemplate(footer(), 'templates/footer.html')
 
-sorted = sorted
